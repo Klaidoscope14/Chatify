@@ -1,29 +1,28 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
-import { useAuthStore } from "./useAuthStore"; // Import authentication store to access the socket
+import { useAuthStore } from "./useAuthStore"; // Access WebSocket from auth store
 
-// Zustand store for chat functionality
 export const useChatStore = create((set, get) => ({
   // State variables
-  messages: [], // Stores the chat messages
-  users: [], // Stores the list of available users
-  selectedUser: null, // Currently selected chat user
-  isUsersLoading: false, // Indicates if user list is being loaded
-  isMessagesLoading: false, // Indicates if messages are being loaded
+  messages: [],
+  users: [],
+  selectedUser: null,
+  isUsersLoading: false,
+  isMessagesLoading: false,
 
   /**
    * Fetches the list of users available for chat.
    */
   getUsers: async () => {
-    set({ isUsersLoading: true }); // Set loading state
+    set({ isUsersLoading: true });
     try {
       const res = await axiosInstance.get("/messages/users");
-      set({ users: res.data }); // Store users in state
+      set({ users: res.data });
     } catch (error) {
-      toast.error(error.response.data.message); // Show error message
+      toast.error(error?.response?.data?.message || "Failed to load users.");
     } finally {
-      set({ isUsersLoading: false }); // Reset loading state
+      set({ isUsersLoading: false });
     }
   },
 
@@ -32,14 +31,19 @@ export const useChatStore = create((set, get) => ({
    * @param {string} userId - The ID of the selected user.
    */
   getMessages: async (userId) => {
-    set({ isMessagesLoading: true }); // Set loading state
+    if (!userId) {
+      toast.error("No user selected.");
+      return;
+    }
+
+    set({ isMessagesLoading: true });
     try {
       const res = await axiosInstance.get(`/messages/${userId}`);
-      set({ messages: res.data }); // Store fetched messages in state
+      set({ messages: res.data });
     } catch (error) {
-      toast.error(error.response.data.message); // Show error message
+      toast.error(error?.response?.data?.message || "Failed to load messages.");
     } finally {
-      set({ isMessagesLoading: false }); // Reset loading state
+      set({ isMessagesLoading: false });
     }
   },
 
@@ -48,47 +52,62 @@ export const useChatStore = create((set, get) => ({
    * @param {Object} messageData - The message content and metadata.
    */
   sendMessage: async (messageData) => {
-    const { selectedUser, messages } = get(); // Get the selected user and current messages
+    const { selectedUser } = get();
+
+    if (!selectedUser?._id) {
+      toast.error("No user selected.");
+      return;
+    }
+
     try {
       const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
-      set({ messages: [...messages, res.data] }); // Append the new message to the chat
+      set((state) => ({ messages: [...state.messages, res.data] }));
     } catch (error) {
-      toast.error(error.response.data.message); // Show error message
+      toast.error(error?.response?.data?.message || "Failed to send message.");
     }
   },
 
   /**
    * Subscribes to real-time message updates via WebSocket.
-   * Listens for incoming messages and updates the state if the message is from the selected user.
    */
   subscribeToMessages: () => {
-    const { selectedUser } = get(); // Get the selected user
-    if (!selectedUser) return; // Do nothing if no user is selected
+    const { selectedUser } = get();
+    if (!selectedUser?._id) return;
 
-    const socket = useAuthStore.getState().socket; // Get WebSocket instance from Auth Store
+    const socket = useAuthStore.getState().socket;
+    if (!socket) {
+      toast.error("Socket not connected.");
+      return;
+    }
+
+    socket.off("newMessage"); // Prevent duplicate listeners
 
     socket.on("newMessage", (newMessage) => {
-      // Check if the new message is from the currently selected user
-      const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
-      if (!isMessageSentFromSelectedUser) return; // Ignore messages from other users
+      const isMessageFromSelectedUser = newMessage.senderId === selectedUser._id;
 
-      set({
-        messages: [...get().messages, newMessage], // Append new message to chat
-      });
+      if (!isMessageFromSelectedUser) return;
+
+      set((state) => ({
+        messages: [...state.messages, newMessage],
+      }));
     });
   },
 
   /**
-   * Unsubscribes from the WebSocket event to stop receiving real-time messages.
+   * Unsubscribes from the WebSocket event.
    */
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
-    socket.off("newMessage"); // Remove event listener
+    if (socket) {
+      socket.off("newMessage");
+    }
   },
 
   /**
-   * Updates the currently selected user for chat.
-   * @param {Object} selectedUser - The user object to be set as the current chat user.
+   * Sets the currently selected chat user.
+   * @param {Object} selectedUser - The user object to be set.
    */
-  setSelectedUser: (selectedUser) => set({ selectedUser }),
+  setSelectedUser: (selectedUser) => {
+    set({ selectedUser });
+  },
 }));
