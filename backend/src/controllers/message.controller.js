@@ -36,7 +36,7 @@ export const getMessages = async (req, res) => {
         { senderId: myId, receiverId: userToChatId },
         { senderId: userToChatId, receiverId: myId },
       ],
-    });
+    }).sort({ createdAt: 1 });
 
     // Send the retrieved messages as a response
     res.status(200).json(messages);
@@ -57,12 +57,21 @@ export const sendMessage = async (req, res) => {
     // Get the logged-in user's ID (sender)
     const senderId = req.user._id;
 
+    // Validate that we have at least text or image
+    if (!text && !image) {
+      return res.status(400).json({ error: "Message content is required" });
+    }
+
     let imageUrl;
     if (image) {
-      // Upload base64 image to cloudinary
-      // If an image is provided, upload it to Cloudinary and get the secure URL
-      const uploadResponse = await cloudinary.uploader.upload(image);
-      imageUrl = uploadResponse.secure_url;
+      try {
+        // Upload base64 image to cloudinary
+        const uploadResponse = await cloudinary.uploader.upload(image);
+        imageUrl = uploadResponse.secure_url;
+      } catch (error) {
+        console.log("Error uploading image:", error);
+        // Continue without image if upload fails
+      }
     }
 
     // Create a new message object
@@ -74,18 +83,28 @@ export const sendMessage = async (req, res) => {
     });
 
     // Save the new message to the database
-    await newMessage.save();
+    const savedMessage = await newMessage.save();
 
-    // Get the receiver's WebSocket socket ID
-    const receiverSocketId = getReceiverSocketId(receiverId);
-    
-    // If the receiver is online, send them the new message via WebSockets
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newMessage", newMessage);
+    // Send message via WebSockets - send to receiver only
+    // The sender already has the message from the API response
+    try {
+      // Get the receiver's WebSocket socket ID
+      const receiverSocketId = getReceiverSocketId(receiverId);
+      
+      // If the receiver is online, send them the new message via WebSockets
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("newMessage", savedMessage);
+      }
+      
+      // We no longer notify the sender via socket since they already have the message
+      // from the API response. This prevents duplicate messages.
+    } catch (error) {
+      console.log("Socket error in sendMessage:", error);
+      // Don't fail the request if socket communication fails
     }
 
     // Send the saved message as a response
-    res.status(201).json(newMessage);
+    res.status(201).json(savedMessage);
   } catch (error) {
     console.log("Error in sendMessage controller: ", error.message);
     

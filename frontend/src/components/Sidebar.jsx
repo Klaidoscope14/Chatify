@@ -8,7 +8,7 @@ const Sidebar = () => {
   // Extracting user-related state and actions from the chat store
   const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
   // Extracting online users from the auth store
-  const { onlineUsers } = useAuthStore();
+  const { onlineUsers, socket } = useAuthStore();
   
   // State to filter only online users
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
@@ -18,7 +18,22 @@ const Sidebar = () => {
   // Fetch users when the component mounts
   useEffect(() => {
     getUsers();
-  }, []);
+    
+    // Request the latest online users list when component mounts
+    if (socket) {
+      socket.emit("getOnlineUsers");
+    }
+    
+    // Refresh user list periodically
+    const interval = setInterval(() => {
+      getUsers();
+      if (socket) {
+        socket.emit("getOnlineUsers");
+      }
+    }, 30000); // refresh every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [socket]);
 
   // Filter users based on the "Show online only" toggle
   const filteredUsers = showOnlineOnly
@@ -26,7 +41,7 @@ const Sidebar = () => {
     : users ?? [];
 
   // If users are still loading, display a loading skeleton
-  if (isUsersLoading) return <SidebarSkeleton />;
+  if (isUsersLoading && filteredUsers.length === 0) return <SidebarSkeleton />;
 
   return (
     <aside 
@@ -66,7 +81,7 @@ const Sidebar = () => {
           </label>
           {/* Show the count of online users */}
           <span className="text-xs text-zinc-500">
-            ({(onlineUsers?.length ?? 1)} online)
+            ({(onlineUsers?.length ?? 0)} online)
           </span>
         </div>
       )}
@@ -87,7 +102,7 @@ const Sidebar = () => {
             <div className="relative mx-auto lg:mx-0">
               <img
                 src={user.profilePic || "/avatar.png"} // Default avatar if none provided
-                alt={user.name}
+                alt={user.fullName}
                 className="size-12 object-cover rounded-full"
               />
               {/* Online Status Indicator */}

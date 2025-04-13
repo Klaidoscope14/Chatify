@@ -10,3 +10,17 @@ export const axiosInstance = axios.create({
   // Enable sending cookies and credentials with cross-origin requests
   withCredentials: true,
 });
+
+// Add response interceptor to handle 401 errors gracefully
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Only log auth errors on routes that aren't logout or login
+    if (error.response?.status === 401 && 
+        !error.config.url.includes('/auth/logout') && 
+        !error.config.url.includes('/auth/login')) {
+      console.log('Authentication error:', error.response?.data?.message);
+    }
+    return Promise.reject(error);
+  }
+);

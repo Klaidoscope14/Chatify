@@ -38,3 +38,32 @@ export const protectRoute = async (req, res, next) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
+// Optional authentication middleware - doesn't throw error if not authenticated
+export const optionalAuth = async (req, res, next) => {
+    try {
+        const token = req.cookies.jwt;
+        
+        // If no token, just continue without authentication
+        if (!token) {
+            return next();
+        }
+        
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const user = await User.findById(decoded.userId).select("-password");
+            
+            if (user) {
+                req.user = user;
+            }
+        } catch (err) {
+            // If token is invalid, just ignore and continue
+            console.log("Invalid token in optionalAuth, continuing without authentication");
+        }
+        
+        next();
+    } catch (error) {
+        console.log("Error in optionalAuth middleware:", error.message);
+        next(); // Continue anyway
+    }
+};

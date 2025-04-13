@@ -4,7 +4,7 @@ import toast from "react-hot-toast"; // For toast notifications
 import { io } from "socket.io-client"; // For real-time communication
 
 // Set the base URL depending on the environment
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
+const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001" : "";
 
 // Zustand store for authentication and socket management
 export const useAuthStore = create((set, get) => ({
@@ -39,7 +39,8 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Account created successfully"); // Show success message
       get().connectSocket(); // Connect to socket
     } catch (error) {
-      toast.error(error.response.data.message); // Show error message
+      const errorMessage = error?.response?.data?.message || "Sign up failed. Please try again.";
+      toast.error(errorMessage); // Show error message
     } finally {
       set({ isSigningUp: false }); // Reset loading state
     }
@@ -54,7 +55,8 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Logged in successfully"); // Show success message
       get().connectSocket(); // Connect to socket
     } catch (error) {
-      toast.error(error.response.data.message); // Show error message
+      const errorMessage = error?.response?.data?.message || "Login failed. Please check your credentials.";
+      toast.error(errorMessage); // Show error message
     } finally {
       set({ isLoggingIn: false }); // Reset loading state
     }
@@ -63,12 +65,24 @@ export const useAuthStore = create((set, get) => ({
   // Logout function
   logout: async () => {
     try {
-      await axiosInstance.post("/auth/logout"); // Send logout request
-      set({ authUser: null }); // Reset user state
-      toast.success("Logged out successfully"); // Show success message
-      get().disconnectSocket(); // Disconnect from socket
+      // First, update local state to prevent any more API calls
+      // that would require authentication
+      set({ authUser: null, onlineUsers: [] });
+      
+      // Disconnect socket first to prevent reconnection attempts
+      get().disconnectSocket();
+      
+      // Send logout request - ignore any errors
+      try {
+        await axiosInstance.post("/auth/logout");
+        toast.success("Logged out successfully");
+      } catch (error) {
+        // Silently handle logout errors - user is already logged out in UI
+        console.log("Logout API error (ignoring):", error);
+      }
     } catch (error) {
-      toast.error(error.response.data.message); // Show error message
+      // This catch shouldn't be needed but kept for safety
+      console.error("Unexpected error during logout:", error);
     }
   },
 
@@ -81,7 +95,8 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Profile updated successfully"); // Show success message
     } catch (error) {
       console.log("Error in updateProfile:", error);
-      toast.error(error.response.data.message); // Show error message
+      const errorMessage = error?.response?.data?.message || "Profile update failed. Please try again.";
+      toast.error(errorMessage); // Show error message
     } finally {
       set({ isUpdatingProfile: false }); // Reset loading state
     }
@@ -90,23 +105,79 @@ export const useAuthStore = create((set, get) => ({
   // Connect to WebSocket for real-time updates
   connectSocket: () => {
     const { authUser } = get();
-    if (!authUser || get().socket?.connected) return; // Avoid reconnecting if already connected
+    if (!authUser || !authUser._id) {
+      console.log("Cannot connect socket: No authenticated user");
+      return;
+    }
+    
+    // Disconnect existing socket before creating a new one
+    get().disconnectSocket();
+    
+    try {
+      console.log("Connecting socket for user:", authUser._id);
+      
+      const socket = io(BASE_URL, {
+        query: { userId: authUser._id }, // Pass user ID for socket authentication
+        reconnectionDelay: 1000, // Wait 1s before trying to reconnect
+        reconnectionAttempts: 10, // More retry attempts
+        timeout: 20000, // Longer timeout (20s)
+        withCredentials: true, // Enable sending cookies
+      });
+      
+      // Set socket in state immediately to prevent multiple connections
+      set({ socket });
+      
+      socket.on("connect", () => {
+        console.log("Socket connected successfully with ID:", socket.id);
+        // Request online users as soon as we connect
+        socket.emit("getOnlineUsers");
+      });
+      
+      socket.on("connect_error", (err) => {
+        console.error("Socket connection error:", err.message);
+      });
 
-    const socket = io(BASE_URL, {
-      query: { userId: authUser._id }, // Pass user ID for socket authentication
-    });
-    socket.connect();
-
-    set({ socket: socket }); // Store socket instance
-
-    // Listen for online users event
-    socket.on("getOnlineUsers", (userIds) => {
-      set({ onlineUsers: userIds }); // Update online users list
-    });
+      // Listen for online users event
+      socket.on("onlineUsers", (userIds) => {
+        console.log("Received online users:", userIds);
+        set({ onlineUsers: userIds });
+      });
+      
+      // Handle errors
+      socket.on("error", (error) => {
+        console.error("Socket error:", error);
+      });
+      
+      // Handle disconnection
+      socket.on("disconnect", (reason) => {
+        console.log("Socket disconnected:", reason);
+      });
+      
+    } catch (error) {
+      console.error("Error initializing socket:", error);
+    }
   },
 
   // Disconnect WebSocket connection
   disconnectSocket: () => {
-    if (get().socket?.connected) get().socket.disconnect();
+    const socket = get().socket;
+    if (!socket) return;
+    
+    try {
+      socket.off("connect");
+      socket.off("connect_error");
+      socket.off("onlineUsers");
+      socket.off("error");
+      socket.off("disconnect");
+      
+      if (socket.connected) {
+        socket.disconnect();
+        console.log("Socket disconnected");
+      }
+      
+      set({ socket: null });
+    } catch (error) {
+      console.error("Error disconnecting socket:", error);
+    }
   },
 }));
