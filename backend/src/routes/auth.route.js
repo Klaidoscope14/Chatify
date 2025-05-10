@@ -2,7 +2,7 @@
 
 import express from "express";  
 import { checkAuth, login, logout, signup, updateProfile } from "../controllers/auth.controller.js"; 
-import { protectRoute, optionalAuth } from "../middleware/auth.middleware.js";  
+import { protectRoute } from "../middleware/auth.middleware.js";  
 
 const router = express.Router();  
 
@@ -15,7 +15,7 @@ router.post("/login", login);
 // Calls the login controller when a POST request is made to /login
 
 // Route for user logout - using optionalAuth to prevent unauthorized errors on logout
-router.post("/logout", optionalAuth, logout);
+router.post("/logout", logout);
 // Calls the logout controller when a POST request is made to /logout
 
 // Route for updating user profile (Protected Route)
