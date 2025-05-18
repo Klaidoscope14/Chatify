@@ -1,6 +1,6 @@
-import { THEMES } from "../constants"; // Import predefined themes
-import { useThemeStore } from "../store/useThemeStore"; // Import theme store for state management
-import { Send } from "lucide-react"; // Import icon for the send button
+import { THEMES } from "../constants"; 
+import { useThemeStore } from "../store/useThemeStore"; 
+import { Send } from "lucide-react";
 
 // Mock chat messages for the preview section
 const PREVIEW_MESSAGES = [

@@ -5,10 +5,8 @@ import { Link } from "react-router-dom";
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
 
 const LoginPage = () => {
-  // State to toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
 
-  // State to store form input values (email & password)
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -20,11 +18,10 @@ const LoginPage = () => {
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevents page reload
-    login(formData); // Calls login function with email & password
+    login(formData); 
   };
 
   return (
-    // Main container using CSS grid for a two-column layout
     <div className="h-screen grid lg:grid-cols-2">
       {/* Left Side - Login Form */}
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">

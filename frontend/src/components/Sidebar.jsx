@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useChatStore } from "../store/useChatStore"; // Chat store for managing users
-import { useAuthStore } from "../store/useAuthStore"; // Auth store for tracking online users
-import SidebarSkeleton from "./skeletons/SidebarSkeleton"; // Loading skeleton while fetching users
-import { Users, ChevronLeft, ChevronRight } from "lucide-react"; // Icons for UI elements
+import { useChatStore } from "../store/useChatStore"; 
+import { useAuthStore } from "../store/useAuthStore"; 
+import SidebarSkeleton from "./Skeletons/SidebarSkeleton"; 
+import { Users, ChevronLeft, ChevronRight } from "lucide-react"; 
 
 const Sidebar = () => {
   // Extracting user-related state and actions from the chat store
@@ -40,7 +40,6 @@ const Sidebar = () => {
     ? (users ?? []).filter((user) => onlineUsers?.includes(user._id))
     : users ?? [];
 
-  // If users are still loading, display a loading skeleton
   if (isUsersLoading && filteredUsers.length === 0) return <SidebarSkeleton />;
 
   return (
@@ -54,7 +53,7 @@ const Sidebar = () => {
       <div className="border-b border-base-300 w-full p-5 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Users className="size-6" /> {/* Users icon */}
-          {isExpanded && <span className="font-medium">Contacts</span>} {/* Show label only when expanded */}
+          {isExpanded && <span className="font-medium">Contacts</span>} 
         </div>
 
         {/* Expand/Collapse Button */}

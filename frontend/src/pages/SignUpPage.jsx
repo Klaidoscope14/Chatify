@@ -6,7 +6,6 @@ import AuthImagePattern from "../components/AuthImagePattern";
 import toast from "react-hot-toast";
 
 const SignUpPage = () => {
-  // State to toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
   
   // State to manage form data

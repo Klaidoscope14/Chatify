@@ -1,12 +1,9 @@
 const MessageSkeleton = () => {
-  // Create an array of 6 items for skeleton messages (used for loading state)
   const skeletonMessages = Array(6).fill(null);
 
   return (
-    // Main container for the skeleton loader, making it scrollable
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
       {skeletonMessages.map((_, idx) => (
-        // Dynamically assign `chat-start` (left) or `chat-end` (right) based on index
         <div key={idx} className={`chat ${idx % 2 === 0 ? "chat-start" : "chat-end"}`}>
           
           {/* Skeleton avatar placeholder */}

@@ -10,7 +10,6 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// Define allowed origins based on environment
 const allowedOrigins = process.env.NODE_ENV === "production" 
   ? [process.env.PRODUCTION_URL || ""] 
   : ["http://localhost:5173"];
@@ -21,7 +20,7 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
     credentials: true,
   },
-  pingTimeout: 60000, // Close connection after 60s of inactivity
+  pingTimeout: 60000, 
 });
 
 // In-memory map to store online users

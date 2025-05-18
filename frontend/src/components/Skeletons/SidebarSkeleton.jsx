@@ -1,11 +1,9 @@
-import { Users } from "lucide-react"; // Import the Users icon from Lucide React
+import { Users } from "lucide-react";
 
 const SidebarSkeleton = () => {
-  // Create an array with 8 empty elements for skeleton placeholders
   const skeletonContacts = Array(8).fill(null);
 
   return (
-    // Sidebar container with responsive width, border, and transition effects
     <aside
       className="h-full w-20 lg:w-72 border-r border-base-300 
     flex flex-col transition-all duration-200"

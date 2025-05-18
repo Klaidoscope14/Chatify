@@ -20,8 +20,6 @@ const HomePage = () => {
             {/* Sidebar component for displaying user contacts */}
             <Sidebar />
 
-            {/* If no user is selected, show the NoChatSelected component */}
-            {/* Otherwise, display the ChatContainer for the active conversation */}
             {!selectedUser ? <NoChatSelected /> : <ChatContainer />}
           </div>
         </div>

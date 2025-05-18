@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom"; // Import Link for navigation
-import { useAuthStore } from "../store/useAuthStore"; // Import authentication store
-import { LogOut, MessageSquare, Settings, User } from "lucide-react"; // Import icons
+import { Link } from "react-router-dom"; 
+import { useAuthStore } from "../store/useAuthStore"; 
+import { LogOut, MessageSquare, Settings, User } from "lucide-react";
 
 const Navbar = () => {
   // Get authentication state and logout function from the store
@@ -34,7 +34,7 @@ const Navbar = () => {
               className={`btn btn-sm gap-2 transition-colors`}
             >
               <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">Settings</span> {/* Visible only on larger screens */}
+              <span className="hidden sm:inline">Settings</span> 
             </Link>
 
             {/* Display Profile & Logout buttons if user is authenticated */}
@@ -43,13 +43,13 @@ const Navbar = () => {
                 {/* Profile Button */}
                 <Link to={"/profile"} className={`btn btn-sm gap-2`}>
                   <User className="size-5" />
-                  <span className="hidden sm:inline">Profile</span> {/* Hidden on small screens */}
+                  <span className="hidden sm:inline">Profile</span> 
                 </Link>
 
                 {/* Logout Button */}
                 <button className="flex gap-2 items-center" onClick={logout}>
                   <LogOut className="size-5" />
-                  <span className="hidden sm:inline">Logout</span> {/* Hidden on small screens */}
+                  <span className="hidden sm:inline">Logout</span> 
                 </button>
               </>
             )}

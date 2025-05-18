@@ -8,7 +8,6 @@ import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
 
 const ChatContainer = () => {
-  // Get chat-related state and functions from store
   const {
     messages,              // List of chat messages
     getMessages,           // Function to fetch messages from backend
@@ -26,27 +25,23 @@ const ChatContainer = () => {
   // Reference to the last message for auto-scrolling
   const lastMessageRef = useRef(null);
 
-  // Fetch messages when the selected user changes
   useEffect(() => {
     if (selectedUser?._id) {
       getMessages(selectedUser._id); // Fetch messages for the selected user
       subscribeToMessages(); // Start real-time message updates
     }
 
-    return () => unsubscribeFromMessages(); // Cleanup on component unmount
+    return () => unsubscribeFromMessages();
   }, [selectedUser?._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
-  // Auto-scroll to the latest message when messages change
   useEffect(() => {
     if (lastMessageRef.current) {
       lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
     } else if (messageContainerRef.current) {
-      // If no last message ref (empty chat), scroll to bottom of container
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
-  // Show a skeleton loader while messages are loading
   if (isMessagesLoading) {
     return (
       <div className="flex-1 flex flex-col overflow-auto">
@@ -76,7 +71,7 @@ const ChatContainer = () => {
             <div
               key={message._id || index}
               className={`chat ${message.senderId === authUser?._id ? "chat-end" : "chat-start"}`}
-              ref={index === messages.length - 1 ? lastMessageRef : null} // Only set ref on last message
+              ref={index === messages.length - 1 ? lastMessageRef : null} 
             >
               {/* User profile picture */}
               <div className="chat-image avatar">
@@ -84,8 +79,8 @@ const ChatContainer = () => {
                   <img
                     src={
                       message.senderId === authUser?._id
-                        ? authUser?.profilePic || "/avatar.png" // Sender's profile pic
-                        : selectedUser?.profilePic || "/avatar.png" // Receiver's profile pic
+                        ? authUser?.profilePic || "/avatar.png"
+                        : selectedUser?.profilePic || "/avatar.png" 
                     }
                     alt="profile pic"
                   />

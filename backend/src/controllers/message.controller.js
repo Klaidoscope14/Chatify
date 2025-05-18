@@ -86,7 +86,6 @@ export const sendMessage = async (req, res) => {
     const savedMessage = await newMessage.save();
 
     // Send message via WebSockets - send to receiver only
-    // The sender already has the message from the API response
     try {
       // Get the receiver's WebSocket socket ID
       const receiverSocketId = getReceiverSocketId(receiverId);
@@ -96,11 +95,9 @@ export const sendMessage = async (req, res) => {
         io.to(receiverSocketId).emit("newMessage", savedMessage);
       }
       
-      // We no longer notify the sender via socket since they already have the message
-      // from the API response. This prevents duplicate messages.
+
     } catch (error) {
       console.log("Socket error in sendMessage:", error);
-      // Don't fail the request if socket communication fails
     }
 
     // Send the saved message as a response

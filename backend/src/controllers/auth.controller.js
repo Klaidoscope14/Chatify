@@ -1,7 +1,7 @@
-import { generateToken } from "../lib/utils.js"; // Importing function to generate JWT token
-import User from "../models/user.model.js"; // Importing the User model from the database
-import bcrypt from "bcryptjs"; // Importing bcrypt for password hashing
-import cloudinary from "../lib/cloudinary.js"; // Importing Cloudinary for profile picture uploads
+import { generateToken } from "../lib/utils.js";
+import User from "../models/user.model.js"; 
+import bcrypt from "bcryptjs"; 
+import cloudinary from "../lib/cloudinary.js"; 
 
 // Controller for user signup (register)
 export const signup = async (req, res) => {

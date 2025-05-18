@@ -1,9 +1,8 @@
-import { X } from "lucide-react"; // Importing the close (X) icon from Lucide
-import { useAuthStore } from "../store/useAuthStore"; // Import authentication store
-import { useChatStore } from "../store/useChatStore"; // Import chat store
+import { X } from "lucide-react"; 
+import { useAuthStore } from "../store/useAuthStore"; 
+import { useChatStore } from "../store/useChatStore"; 
 
 const ChatHeader = () => {
-  // Get selected user and function to deselect chat
   const { selectedUser, setSelectedUser } = useChatStore();
   // Get the list of online users
   const { onlineUsers } = useAuthStore();
@@ -17,8 +16,8 @@ const ChatHeader = () => {
           <div className="avatar">
             <div className="size-10 rounded-full relative">
               <img
-                src={selectedUser.profilePic || "/avatar.png"} // Fallback avatar if no profile pic
-                alt={selectedUser.fullName} // Image alt text as user's full name
+                src={selectedUser.profilePic || "/avatar.png"} 
+                alt={selectedUser.fullName} 
               />
             </div>
           </div>
@@ -33,8 +32,8 @@ const ChatHeader = () => {
         </div>
 
         {/* Right Section: Close Button */}
-        <button onClick={() => setSelectedUser(null)}> {/* Clear selected user on click */}
-          <X /> {/* Close (X) icon */}
+        <button onClick={() => setSelectedUser(null)}> 
+          <X />
         </button>
       </div>
     </div>

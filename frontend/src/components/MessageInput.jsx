@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
-import { useChatStore } from "../store/useChatStore"; // Import chat store
-import { Image, Send, X } from "lucide-react"; // Import icons for UI
-import toast from "react-hot-toast"; // Import toast for error notifications
+import { useChatStore } from "../store/useChatStore";
+import { Image, Send, X } from "lucide-react"; 
+import toast from "react-hot-toast"; 
 
 const MessageInput = () => {
   // State to manage input text
@@ -18,7 +18,6 @@ const MessageInput = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
 
-    // Validate if the selected file is an image
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
@@ -35,7 +34,7 @@ const MessageInput = () => {
   // Remove selected image
   const removeImage = () => {
     setImagePreview(null);
-    if (fileInputRef.current) fileInputRef.current.value = ""; // Reset file input
+    if (fileInputRef.current) fileInputRef.current.value = ""; 
   };
 
   // Handle sending the message
@@ -45,11 +44,10 @@ const MessageInput = () => {
 
     try {
       await sendMessage({
-        text: text.trim(), // Send text message
-        image: imagePreview, // Send image if available
+        text: text.trim(), 
+        image: imagePreview, 
       });
 
-      // Reset input fields after sending message
       setText("");
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
