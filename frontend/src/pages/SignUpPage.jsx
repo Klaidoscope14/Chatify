@@ -8,17 +8,14 @@ import toast from "react-hot-toast";
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   
-  // State to manage form data
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
   });
 
-  // Access signup function and loading state from auth store
   const { signup, isSigningUp } = useAuthStore();
 
-  // Function to validate form inputs
   const validateForm = () => {
     if (!formData.fullName.trim()) return toast.error("Full name is required");
     if (!formData.email.trim()) return toast.error("Email is required");
@@ -28,22 +25,18 @@ const SignUpPage = () => {
     return true;
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent page reload
-    const success = validateForm(); // Validate inputs
-    if (success === true) signup(formData); // Call signup function if valid
+    e.preventDefault();
+    const success = validateForm();
+    if (success === true) signup(formData);
   };
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
-      {/* Left side: Signup form */}
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
-          {/* Logo & Heading */}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
-              {/* Icon */}
               <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                 <MessageSquare className="size-6 text-primary" />
               </div>
@@ -52,9 +45,7 @@ const SignUpPage = () => {
             </div>
           </div>
 
-          {/* Signup Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Full Name Input */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Full Name</span>
@@ -73,7 +64,6 @@ const SignUpPage = () => {
               </div>
             </div>
 
-            {/* Email Input */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Email</span>
@@ -92,7 +82,6 @@ const SignUpPage = () => {
               </div>
             </div>
 
-            {/* Password Input */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Password</span>
@@ -108,7 +97,6 @@ const SignUpPage = () => {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
-                {/* Toggle Password Visibility */}
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
@@ -119,7 +107,6 @@ const SignUpPage = () => {
               </div>
             </div>
 
-            {/* Submit Button */}
             <button type="submit" className="btn btn-primary w-full" disabled={isSigningUp}>
               {isSigningUp ? (
                 <>
@@ -131,7 +118,6 @@ const SignUpPage = () => {
             </button>
           </form>
 
-          {/* Login Link */}
           <div className="text-center">
             <p className="text-base-content/60">
               Already have an account? <Link to="/login" className="link link-primary">Sign in</Link>
@@ -140,7 +126,6 @@ const SignUpPage = () => {
         </div>
       </div>
 
-      {/* Right side: Auth image pattern */}
       <AuthImagePattern
         title="Join our community"
         subtitle="Connect with friends, share moments, and stay in touch with your loved ones."

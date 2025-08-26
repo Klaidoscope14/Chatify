@@ -54,10 +54,8 @@ const ChatContainer = () => {
 
   return (
     <div className="flex-1 flex flex-col overflow-auto">
-      {/* Chat header (shows selected user info) */}
       <ChatHeader />
 
-      {/* Message display area */}
       <div 
         className="flex-1 overflow-y-auto p-4 space-y-4"
         ref={messageContainerRef}
@@ -73,7 +71,6 @@ const ChatContainer = () => {
               className={`chat ${message.senderId === authUser?._id ? "chat-end" : "chat-start"}`}
               ref={index === messages.length - 1 ? lastMessageRef : null} 
             >
-              {/* User profile picture */}
               <div className="chat-image avatar">
                 <div className="size-10 rounded-full border">
                   <img
@@ -94,9 +91,7 @@ const ChatContainer = () => {
                 </time>
               </div>
 
-              {/* Message bubble */}
               <div className="chat-bubble flex flex-col">
-                {/* Display image if message contains an image */}
                 {message.image && (
                   <img
                     src={message.image}
@@ -104,8 +99,6 @@ const ChatContainer = () => {
                     className="sm:max-w-[200px] rounded-md mb-2"
                   />
                 )}
-
-                {/* Display text message if available */}
                 {message.text && <p>{message.text}</p>}
               </div>
             </div>
@@ -113,7 +106,6 @@ const ChatContainer = () => {
         )}
       </div>
 
-      {/* Message input field */}
       <MessageInput />
     </div>
   );

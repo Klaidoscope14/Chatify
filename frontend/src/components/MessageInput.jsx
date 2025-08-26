@@ -4,17 +4,12 @@ import { Image, Send, X } from "lucide-react";
 import toast from "react-hot-toast"; 
 
 const MessageInput = () => {
-  // State to manage input text
   const [text, setText] = useState("");
-  // State to store image preview URL
   const [imagePreview, setImagePreview] = useState(null);
-  // Reference for file input (to trigger file selection programmatically)
   const fileInputRef = useRef(null);
 
-  // Access sendMessage function from the chat store
   const { sendMessage } = useChatStore();
 
-  // Handle image selection
   const handleImageChange = (e) => {
     const file = e.target.files[0];
 
@@ -31,13 +26,10 @@ const MessageInput = () => {
     reader.readAsDataURL(file); // Convert image to Data URL
   };
 
-  // Remove selected image
   const removeImage = () => {
     setImagePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = ""; 
   };
-
-  // Handle sending the message
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return; // Prevent empty messages
@@ -58,7 +50,6 @@ const MessageInput = () => {
 
   return (
     <div className="p-4 w-full">
-      {/* Display image preview if an image is selected */}
       {imagePreview && (
         <div className="mb-3 flex items-center gap-2">
           <div className="relative">
@@ -67,7 +58,6 @@ const MessageInput = () => {
               alt="Preview"
               className="w-20 h-20 object-cover rounded-lg border border-zinc-700"
             />
-            {/* Remove image button */}
             <button
               onClick={removeImage}
               className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-base-300
@@ -80,10 +70,8 @@ const MessageInput = () => {
         </div>
       )}
 
-      {/* Message Input Form */}
       <form onSubmit={handleSendMessage} className="flex items-center gap-2">
         <div className="flex-1 flex gap-2">
-          {/* Text Input Field */}
           <input
             type="text"
             className="w-full input input-bordered rounded-lg input-sm sm:input-md"
@@ -92,7 +80,6 @@ const MessageInput = () => {
             onChange={(e) => setText(e.target.value)}
           />
 
-          {/* Hidden File Input for Image Upload */}
           <input
             type="file"
             accept="image/*"
@@ -101,7 +88,6 @@ const MessageInput = () => {
             onChange={handleImageChange}
           />
 
-          {/* Image Upload Button */}
           <button
             type="button"
             className={`hidden sm:flex btn btn-circle
@@ -112,11 +98,10 @@ const MessageInput = () => {
           </button>
         </div>
 
-        {/* Send Message Button */}
         <button
           type="submit"
           className="btn btn-sm btn-circle"
-          disabled={!text.trim() && !imagePreview} // Disable if no text/image
+          disabled={!text.trim() && !imagePreview}
         >
           <Send size={22} />
         </button>

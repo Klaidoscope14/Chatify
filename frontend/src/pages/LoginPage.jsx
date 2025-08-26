@@ -12,21 +12,17 @@ const LoginPage = () => {
     password: "",
   });
 
-  // Get login function and loading state from authentication store
   const { login, isLoggingIn } = useAuthStore();
 
-  // Function to handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevents page reload
+    e.preventDefault(); 
     login(formData); 
   };
 
   return (
     <div className="h-screen grid lg:grid-cols-2">
-      {/* Left Side - Login Form */}
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
-          {/* Logo & Welcome Message */}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
               <div
@@ -40,19 +36,15 @@ const LoginPage = () => {
             </div>
           </div>
 
-          {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Input Field */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Email</span>
               </label>
               <div className="relative">
-                {/* Email Icon */}
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-base-content/40" />
                 </div>
-                {/* Email Input */}
                 <input
                   type="email"
                   className={`input input-bordered w-full pl-10`}
@@ -63,17 +55,14 @@ const LoginPage = () => {
               </div>
             </div>
 
-            {/* Password Input Field */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Password</span>
               </label>
               <div className="relative">
-                {/* Lock Icon */}
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-base-content/40" />
                 </div>
-                {/* Password Input */}
                 <input
                   type={showPassword ? "text" : "password"}
                   className={`input input-bordered w-full pl-10`}
@@ -81,7 +70,6 @@ const LoginPage = () => {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
-                {/* Show/Hide Password Button */}
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
@@ -96,7 +84,6 @@ const LoginPage = () => {
               </div>
             </div>
 
-            {/* Sign In Button */}
             <button type="submit" className="btn btn-primary w-full" disabled={isLoggingIn}>
               {isLoggingIn ? (
                 <>
@@ -109,7 +96,6 @@ const LoginPage = () => {
             </button>
           </form>
 
-          {/* Sign Up Link */}
           <div className="text-center">
             <p className="text-base-content/60">
               Don&apos;t have an account?{" "}
@@ -121,7 +107,6 @@ const LoginPage = () => {
         </div>
       </div>
 
-      {/* Right Side - Authentication Image or Pattern */}
       <AuthImagePattern
         title={"Welcome back!"}
         subtitle={"Sign in to continue your conversations and catch up with your messages."}
